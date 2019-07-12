@@ -30,10 +30,55 @@
     - 프로젝트3: 태풍 정보
     - 폼 양식이란?
     - 텍스트와 비밀번호 입력창 만들기
+        ```
+        <form>
+            아이디: <input type='text'>
+            비밀번호: <input type='password'>
+        </form>
+        ```
+        - input: 태그
+        - type: 속성
     - 라디오버튼과 체크박스 만들기
+        ```
+        <form>
+            정보공개: <input type='radio' checked> 공개
+                     <input type='radio'> 비공개
+            취미: <input type='checkbox'> 탁구
+                  <input type='checkbox'> 배드민턴
+                  <input type='checkbox'> 음악감상
+                  <input type='checkbox'> 악기연주
+        </form>
+        ```
+        - checked: 처음부터 체크된 상태가 된다.
     - 선택 박스 만들기
+        ```
+            <form>
+                파일첨부: <input type='file'>
+                <select>
+                    <option>선택</option>
+                    <option>naver.com</option>
+                    <option>hamail.com</option>
+                    <option>gmail.com</option>
+                    <option>직접입력</option>
+                </select>
+            </form>
+        ```
     - 다중 입력 창 만들기
+        ```
+        <form>
+            인사말 남기기
+            <textarea rows='5' cols='60'></textarea> 
+        </form>
+        ```
+        - rows 속성: 다섯줄을 입력
+        - cols 속성: 입력가능한 글자수 
     - 버튼 만들기
+        ```
+            <form>
+                <button type='button'>확인</button>
+            </form>
+        ```
+        - textarea와 같이 쌍으로 닫아 줘야 함.
     - 프로젝트4: 문의 게시판 글쓰기
     - 요점 정리 
 

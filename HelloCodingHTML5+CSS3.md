@@ -81,12 +81,68 @@
         - textarea와 같이 쌍으로 닫아 줘야 함.
     - 프로젝트4: 문의 게시판 글쓰기
     - 요점 정리 
+        - 1. 테이블 삽입
+        - 2. 테이블의 행과 열 합치기
+        - 3. 텍스트와 비밀번호 입력 창
+        - 4. 라디오 버튼과 체크박스
+        - 5. 파일 선택 창
+        - 6. 선택 박스
+        - 7. 다중 입력 창
+        - 8. 버튼
 
 ## 2. CSS 기초와 응용
 ---
 - CSS 기본을 다지자
     - CSS란?
+        - Cascading Style Sheets 의 약어로서 HTML 태그를 보조하여 웹 페이지를 꾸미는 역할을 합니다. 
+            ```
+            # css
+            <style>
+                h3 { color: red;}
+                p { color: blue;}
+            </style>
+            # html
+            <h3>여행(travel)의 어원<h3>
+            <p>여행을 뜻하는 영어 단어 'travel'의 어원은 'travail(고통,고난)' 이라고 합니다. 교통이 발달하지 않은 과거에는 여행이 고통이나 고난이었던 거지요. 여행이 오락이나 쾌락으로 여겨지게 된 것은 교통수단이 조금 더 발달된 19세기에 이르러서 입니다. </p>
+            ```
+            - h3 : 선택자
+            - css 명령: {}
+            - color: 속성
+            - red: 속성값
+            - ; : 명령의 끝을 의미 
     - 글자 스타일 지정하기
+        ```
+        <style>
+            h2 { color: blue; text-shadow: 2px 2px 10px gray;}
+            p { color: #444444; font-size: 18px; font-family: '바탕'; line-height: 150%;}
+            span { font-weight: bold; color: #0e9bdc; text-decoration: underline;}
+            <body>
+                <h2>세렝게티 국립공원</h2>
+                <p><span>탄자니아의 킬리만자로산 서쪽</span>에 위치한 세렝게티(Serengeti)의 광활한 평원은 면적이 1,500,000ha이며, 사바나 지역에 있습니다.<span>사자, 코끼리, 들소, 얼룩말</span>등 약 300만 마리의 대형 포유류가 살고 있습니다.</p>
+            </body>
+        </style>
+        ```
+        - 글 제목의 글자 색상 지정과 그림자 넣기
+            - color: blue;
+                - color속성은 글자 색상을 지정, blue
+            - text-shadow: 2px 2px 10px gray;
+                - text-shadow 속성은 글자에 그림자를 넣기 위한 속성
+        - 단락의 글자 스타일 지정하기
+            - color: #444444;
+                - color속성은 글자의 색상을 의미
+            - font-size: 18px;
+                - font-size 속성은 글자 크기를 의미 
+            - font-family: '바탕';
+                - font-family 속성은 글자의 글꼴
+            - line-height: 150%;
+                - line-height 속성은 줄 간격을 의미 
+        - 특정 영역의 글자에 스타일 지정
+            - font-weight: bold;
+                - 속성 font-weight는 글자의 두께를 의미
+            - color: #0e9bdc;
+                - 글자의 색상
+            - text-decoration: underline;
+                - text-decoration 속성
     - 목록 스타일 지정하기
         - 목록의 글머리 형태 변경하기
         - 목록의 글머리 이미지 삽입하기

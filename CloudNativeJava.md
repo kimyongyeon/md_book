@@ -492,19 +492,208 @@ class ZuulConfiguration {
 }
 - 1: RouteLocator는 인터페이스인데 구현 클래스에는 몇 가지 재미있는 내용이 담겨 있다. 스프링 클라우드는 설정에 따라 @DisvoeryClient를 알고 있는 RouteLocator 구현 클래스를 주입해준다. 
 
-# bootstrap.properties
-# <1>
-spring.application.name=greetings-client
-# <2>
-server.port=${PORT:8082}
-security.oauth2.resource.userInfoUri=http://auth-service/uaa/user
-#security.oauth2.resource.loadBalanced=false
+// # bootstrap.properties
+// # <1>
+// spring.application.name=greetings-client
+// # <2>
+// server.port=${PORT:8082}
+// security.oauth2.resource.userInfoUri=http://auth-service/uaa/user
+// #security.oauth2.resource.loadBalanced=false
 
-hystrix.command.default.execution.isolation.strategy=SEMAPHORE
-spring.mvc.dispatch-options-request=true
+// hystrix.command.default.execution.isolation.strategy=SEMAPHORE
+// spring.mvc.dispatch-options-request=true
 
-zuul.routes.hi.path=/lets/**
-zuul.routes.hi.serviceId=greetings-service
+// zuul.routes.hi.path=/lets/**
+// zuul.routes.hi.serviceId=greetings-service
+
+@Component
+class RoutesListener {
+
+ private final RouteLocator routeLocator;
+
+ private final DiscoveryClient discoveryClient;
+
+ private Log log = LogFactory.getLog(getClass());
+
+ @Autowired
+ public RoutesListener(DiscoveryClient dc, RouteLocator rl) {
+  this.routeLocator = rl;
+  this.discoveryClient = dc;
+ }
+
+ // <1> 메커니즘에 의해 발행되는 이벤트 리스닝
+ @EventListener(HeartbeatEvent.class)
+ public void onHeartbeatEvent(HeartbeatEvent event) {
+  this.log.info("onHeartbeatEvent()");
+  this.discoveryClient.getServices().stream().map(x -> " " + x)
+   .forEach(this.log::info);
+ }
+
+ // <2> 주울 메커니즘에 의해 발행되는 이벤트 리스닝
+ @EventListener(RoutesRefreshedEvent.class)
+ public void onRoutesRefreshedEvent(RoutesRefreshedEvent event) {
+  this.log.info("onRoutesRefreshedEvent()");
+  this.routeLocator.getRoutes().stream().map(x -> " " + x)
+   .forEach(this.log::info);
+ }
+
+}
+
+@Profile("cors")
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 10)
+class CorsFilter implements Filter {
+
+ private final Log log = LogFactory.getLog(getClass());
+
+ private final Map<String, List<ServiceInstance>> catalog = new ConcurrentHashMap<>();
+
+ private final DiscoveryClient discoveryClient;
+
+ // <1> 서비스 토폴리지 정보를 얻기 위해 DiscoveryClient를 사용한다. 
+ @Autowired
+ public CorsFilter(DiscoveryClient discoveryClient) {
+  this.discoveryClient = discoveryClient;
+  this.refreshCatalog();
+ }
+
+ // <2> 서블릿 필터의 doFilter를 오버라이드해서 필요한 필터링 로직을 넣는다. 
+ // isClientAllowed() 결과가 true이면 ACCESS_CONTROL_ALLOW_ORIGIN을 응답 헤더에 추가한다. 
+ @Override
+ public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+  throws IOException, ServletException {
+  HttpServletResponse response = HttpServletResponse.class.cast(res);
+  HttpServletRequest request = HttpServletRequest.class.cast(req);
+  String originHeaderValue = originFor(request);
+  boolean clientAllowed = isClientAllowed(originHeaderValue);
+
+  if (clientAllowed) {
+   response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+    originHeaderValue);
+  }
+
+  chain.doFilter(req, res);
+ }
+
+ // <3> 요청 클라이언트의 오리진이 다운스트림 서비스별 화이트리스트(코드에는 catalog로 되어 있음)에 포함되어 있으면 true를 반환한다. 
+ private boolean isClientAllowed(String origin) {
+  if (StringUtils.hasText(origin)) {
+   URI originUri = URI.create(origin);
+   int port = originUri.getPort();
+   String match = originUri.getHost() + ':' + (port <= 0 ? 80 : port);
+
+   this.catalog.forEach((k, v) -> {
+    String collect = v
+     .stream()
+     .map(
+      si -> si.getHost() + ':' + si.getPort() + '(' + si.getServiceId() + ')')
+     .collect(Collectors.joining());
+  });
+
+   boolean svcMatch = this.catalog
+    .keySet()
+    .stream()
+    .anyMatch(
+     serviceId -> this.catalog.get(serviceId).stream()
+      .map(si -> si.getHost() + ':' + si.getPort())
+      .anyMatch(hp -> hp.equalsIgnoreCase(match)));
+   return svcMatch;
+  }
+  return false;
+ }
+
+ // <4> DiscoveryClient가 생존신호 이벤트를 받을 때마다 화이트리스트가 포함된 다운스트림서비스를 저장하고 있는 로컬 캐시를 페기하고, 새 정보로 갱신한다. 
+ @EventListener(HeartbeatEvent.class)
+ public void onHeartbeatEvent(HeartbeatEvent e) {
+  this.refreshCatalog();
+ }
+
+ private void refreshCatalog() {
+  discoveryClient.getServices().forEach(
+   svc -> this.catalog.put(svc, this.discoveryClient.getInstances(svc)));
+ }
+
+ @Override
+ public void init(FilterConfig filterConfig) throws ServletException {
+ }
+
+ @Override
+ public void destroy() {
+ }
+
+ private String originFor(HttpServletRequest request) {
+  return StringUtils.hasText(request.getHeader(HttpHeaders.ORIGIN)) ? request
+   .getHeader(HttpHeaders.ORIGIN) : request.getHeader(HttpHeaders.REFERER);
+ }
+}
+
+@RestController
+@EnableDiscoveryClient
+@SpringBootApplication
+public class Html5Client {
+
+ private final LoadBalancerClient loadBalancerClient;
+
+ @Autowired
+ Html5Client(LoadBalancerClient loadBalancerClient) {
+  this.loadBalancerClient = loadBalancerClient;
+ }
+
+ public static void main(String[] args) {
+  SpringApplication.run(Html5Client.class, args);
+ }
+
+ // <1> 종단점은 다운스트림의 서비스의 greetings-client 인스턴스의 종단점을 반환한다.
+ // 이 종단점은 엣지 서비스의 CorsFilter에서 Access-Control-* 헤더를 붙여준 덕분에 다른
+ // 오리진에서도 접근할 수 있다. 그리고 LoadBalancerClient를 이용하면 로드밸런서 설정에 따라 인스턴스
+ // 정보를 얻어올 수 있다. 클라이언트 로드밸런서는 기본값으로 넷플릭스 리본을 사용하는데, 리본은
+ // 기본적으로 라운드로빈 로드밸런싱을 사용한다. 
+ //@formatter:off
+ @GetMapping(value = "/greetings-client-uri",
+         produces = MediaType.APPLICATION_JSON_VALUE)
+ //@formatter:on
+ Map<String, String> greetingsClientURI() throws Exception {
+  return Optional
+   .ofNullable(this.loadBalancerClient.choose("greetings-client"))
+   .map(si -> Collections.singletonMap("uri", si.getUri().toString()))
+   .orElse(null);
+ }
+}
+```
+
+- 제이쿼리를 사용하는 자바스크립트 코드 
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>Demo</title>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width"/>
+    <base href="/"/>
+</head>
+<body>
+
+<div id="message"></div>
+
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script>
+    // <1> 현재 어플리케이션의 /greeting-client-uri를 호출해서 greetings-client의 URI를 얻어온다.
+    var greetingsClientUrl = location.protocol + "//" + window.location.host
+        + "/greetings-client-uri";
+    $.ajax({url: greetingsClientUrl}).done(function (data) {
+        var nameToGreet = window.prompt("who would you like to greet?");
+        var greetingsServiceUrl = data['uri'] + "/lets/greet/" + nameToGreet;
+        console.log('greetingsServiceUrl: ' + greetingsServiceUrl);
+        // <2> 받아온 URI에 있는 서버에 크로스 오리진 요청을 보낸다. 
+        $.ajax({url: greetingsServiceUrl}).done(function (greeting) {
+            $("#message").html(greeting['greeting']);
+        });
+    });
+</script>
+</body>
+</html>
 ```
         
 - 엣지 서비스의 보안

@@ -333,6 +333,7 @@
         엣지 서비스가 풀어야할 문제점 제시.
         <br>
         ```java
+
         // EurekaServiceApplication.java
         // <1>
         @EnableEurekaServer
@@ -354,8 +355,9 @@
         ```
         - 1: 자기 자신 등록 안함.
         - 2: 서비스 레지스트리에 등록된 노드 중 정해진 시간 안에 생존신호를 보내지 않는 노드의 비율이 높아지면, 유레카는 일단 이를 애플리케이션 문제가 아니라 네트워크 문제라고 가정하고 생존 신호를 보내지 않는 노드를 레지스트리에서 제거하지 않는데, 이를 자기보호 모드라고 한다. 
-        <br>
+        
         ```java
+
         // GreetingsServiceApplication.java
         // <1>
         @EnableDiscoveryClient
@@ -375,6 +377,7 @@
                 return Collections.singletonMap("greeting", "Hello, " + name + "!");
             }
         }          
+
         ```
         <br>
 

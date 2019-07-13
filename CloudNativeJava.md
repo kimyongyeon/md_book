@@ -309,6 +309,7 @@
                 }
         }        
         ```
+
         - 그외 장점들
             - 요청에 대한 전처리
             - 인증 처리
@@ -322,12 +323,14 @@
     - Composite/Integration Service : Core/Atomic Service를 조합하여 구성한 Service이다.
     - API/Edge Service : Core/Atomic Service, Composite/Integration Service를 조합하여 App에게 노출되는 Service이다. API Gateway의 역활도 수행한다.
     <br>
+    
     - 역할
         - 클라이언트와 백앤드 서버와의 출입문
         - 인증/인가 같은 보안
         - 일정량 이상의 요청 제한
         - 라우팅(라우팅,필터링,API변환,클라이언트어댑터API,서비스프록시)
         - 횡단관심사
+        
     <br>
     - Greeting 서비스
         엣지 서비스가 풀어야할 문제점 제시.
@@ -418,6 +421,7 @@
         - RPC 사용하지 말것
         - REST 장점을 살려라
         - 넷플릭스 페인을 사용하면 인터페이스와 몇 가지 규약을 정의하는 것만으로 서비스 클라이언트를 쉽게 생성할 수 있다. 
+
         ```java
         // <1>
         @FeignClient(serviceId = "greetings-service")

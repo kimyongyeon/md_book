@@ -343,6 +343,9 @@
                 SpringApplication.run(EurekaServiceApplication.class, args);
             }
         }
+        ```
+
+        ```properties
         # application.properties
         server.port=${PORT:8761}
         # bootstrap.properties
@@ -353,11 +356,11 @@
         # <2>
         eureka.server.enable-self-preservation=false
         ```
+
         - 1: 자기 자신 등록 안함.
         - 2: 서비스 레지스트리에 등록된 노드 중 정해진 시간 안에 생존신호를 보내지 않는 노드의 비율이 높아지면, 유레카는 일단 이를 애플리케이션 문제가 아니라 네트워크 문제라고 가정하고 생존 신호를 보내지 않는 노드를 레지스트리에서 제거하지 않는데, 이를 자기보호 모드라고 한다. 
         
         ```java
-
         // GreetingsServiceApplication.java
         // <1>
         @EnableDiscoveryClient
@@ -377,9 +380,7 @@
                 return Collections.singletonMap("greeting", "Hello, " + name + "!");
             }
         }          
-
         ```
-        <br>
 
     - 간단한 엣지 서비스
         ```java

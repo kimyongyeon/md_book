@@ -59,6 +59,7 @@ eureka.server.enable-self-preservation=false
 - 클라이언트 서버 의존관계 
 - org.springframework.boot:spring-boot-starter-web : 스프링 웹 어플리케이션을 만들기 위함 
 - spring-cloud-starter-eureka
+
 ```java
 // GreetingsServiceApplication.java
 @EnableDiscoveryClient

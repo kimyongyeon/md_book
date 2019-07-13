@@ -312,7 +312,8 @@ class RoutingRestController {
     - 상용제품: 애피지
 
 - 엣지 서비스
-    <img src="https://ssup2.github.io/images/theory_analysis/MSA/Service_Type.PNG">
+    ![](https://ssup2.github.io/images/theory_analysis/MSA/Service_Type.PNG)
+    ---
     - Core/Atomic Service : Core Business Logic이나 Atomic한 Business Logic을 수행하는 Service이다.
     - Composite/Integration Service : Core/Atomic Service를 조합하여 구성한 Service이다.
     - API/Edge Service : Core/Atomic Service, Composite/Integration Service를 조합하여 App에게 노출되는 Service이다. API Gateway의 역활도 수행한다.

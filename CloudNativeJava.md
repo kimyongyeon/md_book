@@ -34,9 +34,9 @@ public interface Discovery {
     List<String> getServices();
 }
 ```
-        - 유레카 서비스 레지스트리 의존관계
-            - org.springframework.cloud:spring-cloud-starter-eureka-server
-            - ***@EnableEurekaServer***
+- 유레카 서비스 레지스트리 의존관계
+    - org.springframework.cloud:spring-cloud-starter-eureka-server
+    - ***@EnableEurekaServer***
 ```java
 // EurekaServiceApplication.java
 @EnableEurekaServer
@@ -52,13 +52,13 @@ eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=false
 eureka.server.enable-self-preservation=false
 ```
-            - **클러스터링 구현은 여전히 어렵다. else 지금은 잘된다.**
-            - 서비스들이 모두 유레카를 통해 서로를 발견하고 통신하므로, 유레카는 REST 서비스의 중추 신경계와도 같다.
-            <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFlqdcGJio_dOX8yoHA%2F-LFlqe4npvdvrtdiNTes%2Feureka-high-level-architecture.png?generation=1529844771835661&alt=media">
-            - 참고: https://coe.gitbook.io/guide/service-discovery/eureka_2
-        - 클라이언트 서버 의존관계 
-            - org.springframework.boot:spring-boot-starter-web : 스프링 웹 어플리케이션을 만들기 위함 
-            - spring-cloud-starter-eureka
+- **클러스터링 구현은 여전히 어렵다. else 지금은 잘된다.**
+- 서비스들이 모두 유레카를 통해 서로를 발견하고 통신하므로, 유레카는 REST 서비스의 중추 신경계와도 같다.
+<img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFlqdcGJio_dOX8yoHA%2F-LFlqe4npvdvrtdiNTes%2Feureka-high-level-architecture.png?generation=1529844771835661&alt=media">
+- 참고: https://coe.gitbook.io/guide/service-discovery/eureka_2
+- 클라이언트 서버 의존관계 
+- org.springframework.boot:spring-boot-starter-web : 스프링 웹 어플리케이션을 만들기 위함 
+- spring-cloud-starter-eureka
 ```java
 // GreetingsServiceApplication.java
 @EnableDiscoveryClient
@@ -94,7 +94,7 @@ public class DiscoveryClientCLR implements CommandLineRunner {
         this.log.info("localServiceInstance");
         this.logServiceInstance(this.discoveryClient.getLocalServiceInstanec());
         String.serviceId="greeting-service";
-        this.log.info(String.format("registered instances of '%s', serviceId));
+        this.log.info(String.format("registered instances of '%s'", serviceId));
         this.discoveryClient.getInstances(serivceId).forEach(this::logServiceInstance);
     }
     private void logServiceInstance(ServiceInstance si) {
@@ -114,7 +114,6 @@ public class DiscoveryClientCLR implements CommandLineRunner {
 @Component
 public class RibbonCLR implements CommandLineRunner {
     private final DiscoveryClient discoveryClient;
-
     private final Log log = LogFactory.getLog(getClass());
 
     public RibbonCLR(DiscoveryClient discoveryClient) {
@@ -128,14 +127,14 @@ public class RibbonCLR implements CommandLineRunner {
 
     // <1>
     List<Server> servers = this.discoveryClient.getInstances(serviceId).stream()
-    .map(si -> new Server(si.getHost(), si.getPort()))
-    .collect(Collectors.toList());
+        .map(si -> new Server(si.getHost(), si.getPort()))
+        .collect(Collectors.toList());
 
     // <2>
     IRule roundRobinRule = new RoundRobinRule();
 
     BaseLoadBalancer loadBalancer = LoadBalancerBuilder.newBuilder()
-    .withRule(roundRobinRule).buildFixedServerListLoadBalancer(servers);
+        .withRule(roundRobinRule).buildFixedServerListLoadBalancer(servers);
 
     IntStream.range(0, 10).forEach(i -> {
     // <3>
@@ -159,11 +158,8 @@ class LoadBalancedWebClientConfiguration {
 // LoadBalancedWebClientRunner.java
 @Component
 class LoadBalancedWebClientRunner implements ApplicationRunner {
-
     private final Log log = LogFactory.getLog(getClass());
-
     private final WebClient client;
-
     LoadBalancedWebClientRunner(@LoadBalanced WebClient client) {
         this.client = client;
     }
@@ -171,23 +167,21 @@ class LoadBalancedWebClientRunner implements ApplicationRunner {
     // <1>
     @Override
     public void run(ApplicationArguments args) throws Exception {
-
         Map<String, String> variables = Collections.singletonMap("name",
         "Cloud Natives!");
-
         // <2>
         this.client.get().uri("http://greetings-service/hi/{name}", variables)
             .retrieve().bodyToMono(JsonNode.class).map(x -> x.get("greeting").asText()).subscribe(greeting -> log.info("greeting: " + greeting));
     }
 }
 ```
-    - 클라우드 파운드리 라우트 서비스
-        - 클라이언트 로드밸런싱 
-        - 라우팅 동작을 규정하는 중앙의 컴포넌트 역할
-        - 라우트 서비스 
-            - 궁극적으로는 주어진 호스트와 포트에서 모든 HTTP요청을 받아서 처리하고, 변환하는 포워딩을 담당하는 HTTP 서비스다.
-        - 빌드팩, 애플리케이션, 서비스 브로커처럼 개발해서 플랫폼에 플러그인으로 심을 수 있는 클라우드 파운드리의 확장판
-        - 클라우드 파운드리는 현재로서의 하나의 요청에서 다른 요청으로 라우트 서비스 체이닝은 지원하지 않는다. 
+- 클라우드 파운드리 라우트 서비스
+    - 클라이언트 로드밸런싱 
+    - 라우팅 동작을 규정하는 중앙의 컴포넌트 역할
+    - 라우트 서비스 
+        - 궁극적으로는 주어진 호스트와 포트에서 모든 HTTP요청을 받아서 처리하고, 변환하는 포워딩을 담당하는 HTTP 서비스다.
+    - 빌드팩, 애플리케이션, 서비스 브로커처럼 개발해서 플랫폼에 플러그인으로 심을 수 있는 클라우드 파운드리의 확장판
+    - 클라우드 파운드리는 현재로서의 하나의 요청에서 다른 요청으로 라우트 서비스 체이닝은 지원하지 않는다. 
 ```java
 // RouteServiceApplication.java
 @SpringBootApplication
@@ -206,7 +200,6 @@ public class RouteServiceApplication {
         }
 
         private static class NoErrorsResponseErrorHandler extends DefaultResponseErrorHandler {
-
                 @Override
                 public boolean hasError(ClientHttpResponse response) throws IOException {
                         return false;
@@ -214,7 +207,6 @@ public class RouteServiceApplication {
         }
 
         private static final class TrustEverythingClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
-
                 private static SSLContext getSslContext(TrustManager trustManager) {
                         try {
                                 SSLContext sslContext = SSLContext.getInstance("SSL");
@@ -225,7 +217,6 @@ public class RouteServiceApplication {
                                 throw new RuntimeException(e);
                         }
                 }
-
                 @Override
                 protected HttpURLConnection openConnection(URL url, Proxy proxy) throws IOException {
 
@@ -241,20 +232,16 @@ public class RouteServiceApplication {
                 }
 
         }
-
         private static final class TrustEverythingTrustManager implements
             X509TrustManager {
-
                 @Override
                 public void checkClientTrusted(X509Certificate[] x509Certificates, String s)
                     throws CertificateException {
                 }
-
                 @Override
                 public void checkServerTrusted(X509Certificate[] x509Certificates, String s)
                     throws CertificateException {
                 }
-
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
                         return new X509Certificate[0];
@@ -359,8 +346,8 @@ eureka.client.fetch-registry=false
 eureka.server.enable-self-preservation=false
 ```
 
-    - 1: 자기 자신 등록 안함.
-    - 2: 서비스 레지스트리에 등록된 노드 중 정해진 시간 안에 생존신호를 보내지 않는 노드의 비율이 높아지면, 유레카는 일단 이를 애플리케이션 문제가 아니라 네트워크 문제라고 가정하고 생존 신호를 보내지 않는 노드를 레지스트리에서 제거하지 않는데, 이를 자기보호 모드라고 한다. 
+- 1: 자기 자신 등록 안함.
+- 2: 서비스 레지스트리에 등록된 노드 중 정해진 시간 안에 생존신호를 보내지 않는 노드의 비율이 높아지면, 유레카는 일단 이를 애플리케이션 문제가 아니라 네트워크 문제라고 가정하고 생존 신호를 보내지 않는 노드를 레지스트리에서 제거하지 않는데, 이를 자기보호 모드라고 한다. 
     
 ```java
 // GreetingsServiceApplication.java
@@ -464,24 +451,24 @@ class FeignGreetingsClientApiGateway {
         - Zuul 2.0 Architecture
             <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFeAkrDtna1r8J8fu9J%2F-LE8aMYIWejnnlftUAtL%2Fzuul-how-it-works.png?generation=1529716086552876&alt=media">
        
-        - 주울필터 역할
-            - 동적 라우팅 로직 포함
-            - 로드밸런싱
-            - 서비스 보호 기능 
-            - 문제 경로 파악과 디버깅을 지원하는 도구
-            - 지오로케이션, 쿠키전파, 토큰 복호화 등을 담당하며서 시스템에 들어오는 요청을 처리할 수 있는 가장 높은 수준의 컨텍스트를 만드는데 사용
-            - 횡단관심사
-            - 특정 디바이스에서 발생하는 데이터 인코딩 관련 문제
-            - 불필요한 헤더 제거
-            - URL 인코딩등을 처리하면서 요청/응답의 정규화에도 사용된다.
-            - 특정 요청을 격리하는 타켓 라우팅
-            - 트래픽 변형
-            - 글로벌 라우팅
-            - 비정상 노드 및 영역별 무정지 장애 대응 처리
-            - 공격탐지 및 방지 기능
+    - 주울필터 역할
+        - 동적 라우팅 로직 포함
+        - 로드밸런싱
+        - 서비스 보호 기능 
+        - 문제 경로 파악과 디버깅을 지원하는 도구
+        - 지오로케이션, 쿠키전파, 토큰 복호화 등을 담당하며서 시스템에 들어오는 요청을 처리할 수 있는 가장 높은 수준의 컨텍스트를 만드는데 사용
+        - 횡단관심사
+        - 특정 디바이스에서 발생하는 데이터 인코딩 관련 문제
+        - 불필요한 헤더 제거
+        - URL 인코딩등을 처리하면서 요청/응답의 정규화에도 사용된다.
+        - 특정 요청을 격리하는 타켓 라우팅
+        - 트래픽 변형
+        - 글로벌 라우팅
+        - 비정상 노드 및 영역별 무정지 장애 대응 처리
+        - 공격탐지 및 방지 기능
             
-        - 주울게이트웨이
-            - 시스템을 통과하는 데이터의 흐름을 한곳에서 관찰할 수 있는 장소라는 관점에서 일종의 품질 보증 도구 역할도 담당한다고 볼 수 있다.
+    - 주울게이트웨이
+        - 시스템을 통과하는 데이터의 흐름을 한곳에서 관찰할 수 있는 장소라는 관점에서 일종의 품질 보증 도구 역할도 담당한다고 볼 수 있다.
             
 ```java
 @Configuration

@@ -26,7 +26,7 @@
             - 코드 변경 필요
         - 상용제품 구현체: 클라우드 파운드리, 아파치 주키퍼, 해시코프컨설, 넷플릭스유레카
         - 추상화: 
-```
+```java
 public interface Discovery {
     String description();
     ServiceInstance getLocalServiceInstnace();
@@ -62,7 +62,7 @@ eureka.server.enable-self-preservation=false
 - org.springframework.boot:spring-boot-starter-web : 스프링 웹 어플리케이션을 만들기 위함 
 - spring-cloud-starter-eureka
 
-```
+```java
 // GreetingsServiceApplication.java
 @EnableDiscoveryClient
 @SpringBootApplication
@@ -114,7 +114,7 @@ public class DiscoveryClientCLR implements CommandLineRunner {
     - 클라이언트 로드밸런싱 라이브러리 
     - 라운드로빈, 응답가중치, 확장성 다양한 로드밸런싱 전략을 지원함.
 
-```
+```java
 // RibbonCLR.java
 @Component
 public class RibbonCLR implements CommandLineRunner {
@@ -508,6 +508,7 @@ zuul.routes.hi.serviceId=greetings-service
 ```
         
 - 엣지 서비스의 보안
+
 - OAuth
 - 스프링 시큐리티
 - 스프링 클라우드 시큐리티

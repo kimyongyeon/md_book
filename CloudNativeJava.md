@@ -60,7 +60,7 @@ eureka.server.enable-self-preservation=false
 - org.springframework.boot:spring-boot-starter-web : 스프링 웹 어플리케이션을 만들기 위함 
 - spring-cloud-starter-eureka
 
-```java
+```
 // GreetingsServiceApplication.java
 @EnableDiscoveryClient
 @SpringBootApplication
@@ -105,12 +105,14 @@ public class DiscoveryClientCLR implements CommandLineRunner {
 }
 
 ```
+
 - 인스턴스를 랜덤하게 하나 선택 가능
 - 응답 가중치 전략 선택 가능
 - 넷플릭스 리본 
     - 클라이언트 로드밸런싱 라이브러리 
     - 라운드로빈, 응답가중치, 확장성 다양한 로드밸런싱 전략을 지원함.
-```java
+
+```
 // RibbonCLR.java
 @Component
 public class RibbonCLR implements CommandLineRunner {
@@ -176,6 +178,7 @@ class LoadBalancedWebClientRunner implements ApplicationRunner {
     }
 }
 ```
+
 - 클라우드 파운드리 라우트 서비스
     - 클라이언트 로드밸런싱 
     - 라우팅 동작을 규정하는 중앙의 컴포넌트 역할

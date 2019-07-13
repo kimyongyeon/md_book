@@ -330,92 +330,91 @@
         - 일정량 이상의 요청 제한
         - 라우팅(라우팅,필터링,API변환,클라이언트어댑터API,서비스프록시)
         - 횡단관심사
-        
+
     <br>
     - Greeting 서비스
         엣지 서비스가 풀어야할 문제점 제시.
-        <br>
-        ```java
-
-        // EurekaServiceApplication.java
-        // <1>
-        @EnableEurekaServer
-        @SpringBootApplication
-        public class EurekaServiceApplication {
-            public static void main(String args[]) {
-                SpringApplication.run(EurekaServiceApplication.class, args);
-            }
-        }
-        ```
-
-        ```properties
-        # application.properties
-        server.port=${PORT:8761}
-        # bootstrap.properties
-        spring.application.name=eureka-service
-        # <1>
-        eureka.client.register-with-eureka=false
-        eureka.client.fetch-registry=false
-        # <2>
-        eureka.server.enable-self-preservation=false
-        ```
-
-        - 1: 자기 자신 등록 안함.
-        - 2: 서비스 레지스트리에 등록된 노드 중 정해진 시간 안에 생존신호를 보내지 않는 노드의 비율이 높아지면, 유레카는 일단 이를 애플리케이션 문제가 아니라 네트워크 문제라고 가정하고 생존 신호를 보내지 않는 노드를 레지스트리에서 제거하지 않는데, 이를 자기보호 모드라고 한다. 
         
-        ```java
-        // GreetingsServiceApplication.java
-        // <1>
-        @EnableDiscoveryClient
-        @SpringBootApplication
-        public class GreetingsServiceApplication {
-            public static void main(String[] args) {
-                SpringApplication.run(GreetingsServiceApplication.class, args);
-            }
-        }      
-        // DefaultGreetingsRestController.java
-        @Profile({ "default", "insecure" })
-        @RestController
-        @RequestMapping(method = RequestMethod.GET, value = "/greet/{name}")
-        class DefaultGreetingsRestController {
-            @RequestMapping
-            Map<String, String> hi(@PathVariable String name) {
-                return Collections.singletonMap("greeting", "Hello, " + name + "!");
-            }
-        }          
-        ```
+    ```java
+    // EurekaServiceApplication.java
+    // <1>
+    @EnableEurekaServer
+    @SpringBootApplication
+    public class EurekaServiceApplication {
+        public static void main(String args[]) {
+            SpringApplication.run(EurekaServiceApplication.class, args);
+        }
+    }
+    ```
+
+    ```
+    # application.properties
+    server.port=${PORT:8761}
+    # bootstrap.properties
+    spring.application.name=eureka-service
+    # <1>
+    eureka.client.register-with-eureka=false
+    eureka.client.fetch-registry=false
+    # <2>
+    eureka.server.enable-self-preservation=false
+    ```
+
+    - 1: 자기 자신 등록 안함.
+    - 2: 서비스 레지스트리에 등록된 노드 중 정해진 시간 안에 생존신호를 보내지 않는 노드의 비율이 높아지면, 유레카는 일단 이를 애플리케이션 문제가 아니라 네트워크 문제라고 가정하고 생존 신호를 보내지 않는 노드를 레지스트리에서 제거하지 않는데, 이를 자기보호 모드라고 한다. 
+    
+    ```java
+    // GreetingsServiceApplication.java
+    // <1>
+    @EnableDiscoveryClient
+    @SpringBootApplication
+    public class GreetingsServiceApplication {
+        public static void main(String[] args) {
+            SpringApplication.run(GreetingsServiceApplication.class, args);
+        }
+    }      
+    // DefaultGreetingsRestController.java
+    @Profile({ "default", "insecure" })
+    @RestController
+    @RequestMapping(method = RequestMethod.GET, value = "/greet/{name}")
+    class DefaultGreetingsRestController {
+        @RequestMapping
+        Map<String, String> hi(@PathVariable String name) {
+            return Collections.singletonMap("greeting", "Hello, " + name + "!");
+        }
+    }          
+    ```
 
     - 간단한 엣지 서비스
-        ```java
-        @Profile({ "default", "insecure" })
-        @RestController
-        @RequestMapping("/api")
-        class RestTemplateGreetingsClientApiGateway {
+    ```java
+    @Profile({ "default", "insecure" })
+    @RestController
+    @RequestMapping("/api")
+    class RestTemplateGreetingsClientApiGateway {
 
-            private final RestTemplate restTemplate;
+        private final RestTemplate restTemplate;
 
-            @Autowired
-            RestTemplateGreetingsClientApiGateway(
-                @LoadBalanced RestTemplate restTemplate) { // <1>
-                this.restTemplate = restTemplate;
-            }
-
-            @GetMapping("/resttemplate/{name}")
-            Map<String, String> restTemplate(@PathVariable String name) {
-
-                //@formatter:off
-                ParameterizedTypeReference<Map<String, String>> type =
-                    new ParameterizedTypeReference<Map<String, String>>() {};
-                //@formatter:on
-
-                ResponseEntity<Map<String, String>> responseEntity = this.restTemplate
-                .exchange("http://greetings-service/greet/{name}", HttpMethod.GET, null,
-                    type, name);
-                return responseEntity.getBody();
-            }
+        @Autowired
+        RestTemplateGreetingsClientApiGateway(
+            @LoadBalanced RestTemplate restTemplate) { // <1>
+            this.restTemplate = restTemplate;
         }
-        ```
-        - 간단하게 받아서 외부서비스를 호출하는 gateway 구현
+
+        @GetMapping("/resttemplate/{name}")
+        Map<String, String> restTemplate(@PathVariable String name) {
+
+            //@formatter:off
+            ParameterizedTypeReference<Map<String, String>> type =
+                new ParameterizedTypeReference<Map<String, String>>() {};
+            //@formatter:on
+
+            ResponseEntity<Map<String, String>> responseEntity = this.restTemplate
+            .exchange("http://greetings-service/greet/{name}", HttpMethod.GET, null,
+                type, name);
+            return responseEntity.getBody();
+        }
+    }
+    ```
+    - 간단하게 받아서 외부서비스를 호출하는 gateway 구현
 
     - 넷플릭스 페인
         - RPC 사용하지 말것

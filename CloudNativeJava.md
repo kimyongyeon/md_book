@@ -695,12 +695,118 @@ public class Html5Client {
 </body>
 </html>
 ```
+
+- 커스텀 주울 필터
+    - pre 필터는 요청이 라우팅 되기 전에 실행된다.
+    - routing 필터는 요청의 실제 라우팅을 처리한다. 
+    - post 필터는 요청이 라우팅된 후에 실행된다.
+    - error필터는 요청 처리중에 에러가 발생하면 실행된다. 
+
+    - 스프링부트 + 스프링 클라우드 = 특별한 필터를 붙인다.
+        - AuthenticationHeaderFilter: 프록시 요청을 찾아서 다운스트림으로 전달하기전에 authorization 헤더를 제거하는 필터
+        - OAuth2TokenRelayFilter: 들어오는 요청이 유효하다면 OAuth접근 토큰을 전파하는 필터
+        - ServletDetectionFilter: HTTP 서블릿 요청이 이미 주울 필터 파이프라인을 통과했는지 추적하는 필터
+        - Servlet30WrapperFilter: 들어오는 요청을 서블릿 3.0 데코레이터로 감싸주는 필터
+        - FormBodyWrapperFilter
+        - DebugFilter
+        - SendResponseFilter
+        - SendErrorFilter
+        - SendForwrdFilter
+        - SimleHostRoutingFilter
+        - RibbonRoutingFilter
+    - 요청 제한기 필터 구현
+
+```java
+@Profile("throttled")
+@Configuration
+class ThrottlingConfiguration {
+
+ @Bean //<1> 초당 몇개의 요청을 허용할지 정한다. 초당 0.1개, 즉 10초에 1개의 요청만을 허용하도록 설정했다.
+ RateLimiter rateLimiter() {
+  return RateLimiter.create(1.0D / 10.0D);
+ }
+} 
+
+@Profile("throttled")
+@Component
+class ThrottlingZuulFilter extends ZuulFilter {
+
+ private final HttpStatus tooManyRequests = HttpStatus.TOO_MANY_REQUESTS;
+
+ private final RateLimiter rateLimiter;
+
+ @Autowired
+ public ThrottlingZuulFilter(RateLimiter rateLimiter) {
+  this.rateLimiter = rateLimiter;
+ }
+
+ // <1> 이 필터는 pre필터이며 요청이 프록시 되기 전에 실행된다.
+ @Override
+ public String filterType() {
+  return "pre";
+ }
+
+ // <2> 우선 순위가 가장 높은 필터로서 가능한 한 일찍 실행된다.
+ @Override
+ public int filterOrder() {
+  return Ordered.HIGHEST_PRECEDENCE;
+ }
+
+ // <3> 반드시 실행되는 필수 필터지만 요청 정보나 설정에 의해 비활성화할 수도 있다.
+ @Override
+ public boolean shouldFilter() {
+  return true;
+ }
+
+ // <4> run 메서드에는 Zuulfilter가 실제 필터링하는 로직이 담겨 있다.
+ @Override
+ public Object run() {
+  try {
+   RequestContext currentContext = RequestContext.getCurrentContext();
+   HttpServletResponse response = currentContext.getResponse();
+
+   if (!rateLimiter.tryAcquire()) {
+
+    // <5> 주입받은 속도 조절계에 지정된 속도보다 더 빠른 속도로 요청이 들어오면 HTTP 429 - Too may Requests 에러와 에러 메시지를 반환한다. 
+    response.setContentType(MediaType.TEXT_PLAIN_VALUE);
+    response.setStatus(this.tooManyRequests.value());
+    response.getWriter().append(this.tooManyRequests.getReasonPhrase());
+
+    // <6> 요청의 프록시 과정을 명시적으로 중단한다. 명시적으로 중단하지 않으면 요청은 자동으로 프록시 된다. 
+    currentContext.setSendZuulResponse(false);
+
+    throw new ZuulException(this.tooManyRequests.getReasonPhrase(),
+     this.tooManyRequests.value(), this.tooManyRequests.getReasonPhrase());
+   }
+  }
+  catch (Exception e) {
+   ReflectionUtils.rethrowRuntimeException(e);
+  }
+  return null;
+ }
+}
+```
         
 - 엣지 서비스의 보안
+    - 엣지 서비스는 잠재적으로 악의적인 공격 의도를 담고 있는 요청을 하면 가장 먼저 방어할 수 있는 최전방 수비대라고 할 수 있다. 
+    <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFe8LTXotQeoxRm3cy0%2F-LFe4W0zW_oX1ui_26BP%2Fapi-gateway-in-msa.png?generation=1529715453444393&alt=media">
 
 - OAuth
+    - 1.0, 1.0a, 2.0 세가지 버전 존재한다.
+    - 2.0 기반만 다룸.(1점대는 너무 복잡하고 쓸때없는 기능이 너무 많음 그래서 줄인게 2.0)
+    - 토큰 기반 인가의 표준
+    - 토큰의 장점
+        - 아이디와 패스워드가 노출되는 시간 간격을 줄인다.
+        - 클라이언트가 패스워드에 얽매이지 않게 하면서도 잘못된 클라이언트가 올바른 사용자의 계정을 잠글 수 없도록 보장한다. 
+        - 특정 사용자를 대신해서 클라이언트를 나타내기도 하고, 특정 사용자에 대한 컨텍스트가 없는 토큰을 나타내기도 한다. 
+        - OAuth는 사용자가 누구인지 확인하는 인증 프로토콜이라기보다는 사용자 무슨 권한을 가지고 있는지를 확인하는 인가 프로토콜이다.
+    <img src='http://www.nextree.co.kr/content/images/2017/08/8.png'>
+
 - 스프링 시큐리티
+    <img src='https://t1.daumcdn.net/cfile/tistory/99A7223C5B6B29F003'>
+
 - 스프링 클라우드 시큐리티
+    <img src='https://image.slidesharecdn.com/springsecurityoauth2-180905043902/95/next-generation-spring-security-oauth20-15-638.jpg?cb=1536122909'>
 
 ## 3. 데이터 통합
 ---

@@ -794,7 +794,6 @@ class ThrottlingZuulFilter extends ZuulFilter {
 - 엣지 서비스의 보안
     - 엣지 서비스는 잠재적으로 악의적인 공격 의도를 담고 있는 요청을 하면 가장 먼저 방어할 수 있는 최전방 수비대라고 할 수 있다.
 <img src='https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFe8LTXotQeoxRm3cy0%2F-LFe4W0zW_oX1ui_26BP%2Fapi-gateway-in-msa.png?generation=1529715453444393&alt=media'>
----
 
 - OAuth
     - 1.0, 1.0a, 2.0 세가지 버전 존재한다.
@@ -806,15 +805,13 @@ class ThrottlingZuulFilter extends ZuulFilter {
         - 특정 사용자를 대신해서 클라이언트를 나타내기도 하고, 특정 사용자에 대한 컨텍스트가 없는 토큰을 나타내기도 한다. 
         - OAuth는 사용자가 누구인지 확인하는 인증 프로토콜이라기보다는 사용자 무슨 권한을 가지고 있는지를 확인하는 인가 프로토콜이다.
 <img src='http://www.nextree.co.kr/content/images/2017/08/8.png'>
----
 
 - 스프링 시큐리티
 <img src='https://t1.daumcdn.net/cfile/tistory/99A7223C5B6B29F003'>
----
 
 - 스프링 클라우드 시큐리티
 <img src='https://image.slidesharecdn.com/springsecurityoauth2-180905043902/95/next-generation-spring-security-oauth20-15-638.jpg?cb=1536122909'>
----
+
 
 ## 3. 데이터 통합
 ---

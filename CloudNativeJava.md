@@ -311,7 +311,7 @@ class RoutingRestController {
     - 상용제품: 애피지
 
 - 엣지 서비스
-    <img src="https://ssup2.github.io/images/theory_analysis/MSA/Service_Type.PNG">
+<img src="https://ssup2.github.io/images/theory_analysis/MSA/Service_Type.PNG">
     - Core/Atomic Service : Core Business Logic이나 Atomic한 Business Logic을 수행하는 Service이다.
     - Composite/Integration Service : Core/Atomic Service를 조합하여 구성한 Service이다.
     - API/Edge Service : Core/Atomic Service, Composite/Integration Service를 조합하여 App에게 노출되는 Service이다. API Gateway의 역활도 수행한다.
@@ -452,10 +452,10 @@ class FeignGreetingsClientApiGateway {
     - 넷플릭스 주울을 통한 필터링과 프록시
         
         - Zuul in Netflix's cloud Architecture
-            <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LE8aLapaOcF3H3eke0t%2F-LE8aMYFy_jwf_Vy95yR%2Fzuul-netflix-cloud-architecture.png?generation=1528095670450003&alt=media">
+<img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LE8aLapaOcF3H3eke0t%2F-LE8aMYFy_jwf_Vy95yR%2Fzuul-netflix-cloud-architecture.png?generation=1528095670450003&alt=media">
         
         - Zuul 2.0 Architecture
-            <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFeAkrDtna1r8J8fu9J%2F-LE8aMYIWejnnlftUAtL%2Fzuul-how-it-works.png?generation=1529716086552876&alt=media">
+<img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFeAkrDtna1r8J8fu9J%2F-LE8aMYIWejnnlftUAtL%2Fzuul-how-it-works.png?generation=1529716086552876&alt=media">
        
     - 주울필터 역할
         - 동적 라우팅 로직 포함

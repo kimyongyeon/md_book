@@ -455,11 +455,15 @@
         - 2: 엣지 서비스에 대한 호출은 여전히 REST에 의존하는 메소드 호출이다. 클라이언트는 단순하고 쓰기 쉽다. 페인을 사용할 줄 아는 개발자라면 여기에서 무슨 일이 일어나는지 금방 알아챌 것이다. 
         ```
         - 정리: REST호출로 다른 서비스로부터 데이터를 가져오느느 방법을 알아봄.
+    
     - 넷플릭스 주울을 통한 필터링과 프록시
+        
         - Zuul in Netflix's cloud Architecture
-        <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LE8aLapaOcF3H3eke0t%2F-LE8aMYFy_jwf_Vy95yR%2Fzuul-netflix-cloud-architecture.png?generation=1528095670450003&alt=media">
+            <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LE8aLapaOcF3H3eke0t%2F-LE8aMYFy_jwf_Vy95yR%2Fzuul-netflix-cloud-architecture.png?generation=1528095670450003&alt=media">
+        
         - Zuul 2.0 Architecture
-        <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFeAkrDtna1r8J8fu9J%2F-LE8aMYIWejnnlftUAtL%2Fzuul-how-it-works.png?generation=1529716086552876&alt=media">
+            <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFeAkrDtna1r8J8fu9J%2F-LE8aMYIWejnnlftUAtL%2Fzuul-how-it-works.png?generation=1529716086552876&alt=media">
+       
         - 주울필터 역할
             - 동적 라우팅 로직 포함
             - 로드밸런싱
@@ -478,6 +482,7 @@
             
         - 주울게이트웨이
             - 시스템을 통과하는 데이터의 흐름을 한곳에서 관찰할 수 있는 장소라는 관점에서 일종의 품질 보증 도구 역할도 담당한다고 볼 수 있다.
+            
         ```java
         @Configuration
         @EnableZuulProxy

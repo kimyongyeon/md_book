@@ -332,7 +332,7 @@
     - Greeting 서비스
         엣지 서비스가 풀어야할 문제점 제시.
         ```java
-        # EurekaServiceApplication.java
+        // EurekaServiceApplication.java
         // <1>
         @EnableEurekaServer
         @SpringBootApplication

@@ -792,8 +792,8 @@ class ThrottlingZuulFilter extends ZuulFilter {
 ```
         
 - 엣지 서비스의 보안
-    - 엣지 서비스는 잠재적으로 악의적인 공격 의도를 담고 있는 요청을 하면 가장 먼저 방어할 수 있는 최전방 수비대라고 할 수 있다. 
-    <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFe8LTXotQeoxRm3cy0%2F-LFe4W0zW_oX1ui_26BP%2Fapi-gateway-in-msa.png?generation=1529715453444393&alt=media">
+    - 엣지 서비스는 잠재적으로 악의적인 공격 의도를 담고 있는 요청을 하면 가장 먼저 방어할 수 있는 최전방 수비대라고 할 수 있다.
+    <img src='https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFe8LTXotQeoxRm3cy0%2F-LFe4W0zW_oX1ui_26BP%2Fapi-gateway-in-msa.png?generation=1529715453444393&alt=media'>
     ---
 
 - OAuth

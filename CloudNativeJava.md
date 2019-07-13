@@ -26,32 +26,32 @@
             - 코드 변경 필요
         - 상용제품 구현체: 클라우드 파운드리, 아파치 주키퍼, 해시코프컨설, 넷플릭스유레카
         - 추상화: 
-        ```
-        public interface Discovery {
-            String description();
-            ServiceInstance getLocalServiceInstnace();
-            List<ServiceInstance> getInstance(String var1);
-            List<String> getServices();
-        }
-        ```
+```
+public interface Discovery {
+    String description();
+    ServiceInstance getLocalServiceInstnace();
+    List<ServiceInstance> getInstance(String var1);
+    List<String> getServices();
+}
+```
         - 유레카 서비스 레지스트리 의존관계
             - org.springframework.cloud:spring-cloud-starter-eureka-server
             - ***@EnableEurekaServer***
-            ```java
-            // EurekaServiceApplication.java
-            @EnableEurekaServer
-            @SpringBootApplication
-            public class EurekaServiceApplication {
-                public static void main(String args[]){
-                    SpringApplication.run(EurekaServiceApplication.class, args);
-                }
-            }
-            // application.properties
-            server.port=${PORT:8761}
-            eureka.client.register-with-eureka=false
-            eureka.client.fetch-registry=false
-            eureka.server.enable-self-preservation=false
-            ```
+```java
+// EurekaServiceApplication.java
+@EnableEurekaServer
+@SpringBootApplication
+public class EurekaServiceApplication {
+    public static void main(String args[]){
+        SpringApplication.run(EurekaServiceApplication.class, args);
+    }
+}
+// application.properties
+server.port=${PORT:8761}
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+eureka.server.enable-self-preservation=false
+```
             - **클러스터링 구현은 여전히 어렵다. else 지금은 잘된다.**
             - 서비스들이 모두 유레카를 통해 서로를 발견하고 통신하므로, 유레카는 REST 서비스의 중추 신경계와도 같다.
             <img src="https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFlqdcGJio_dOX8yoHA%2F-LFlqe4npvdvrtdiNTes%2Feureka-high-level-architecture.png?generation=1529844771835661&alt=media">
@@ -59,128 +59,128 @@
         - 클라이언트 서버 의존관계 
             - org.springframework.boot:spring-boot-starter-web : 스프링 웹 어플리케이션을 만들기 위함 
             - spring-cloud-starter-eureka
-            ```java
-            // GreetingsServiceApplication.java
-            @EnableDiscoveryClient
-            @SpringBootApplication
-            public class GreetingsServiceApplication {
-                public static void main(String args[]){
-                    SpringApplication.run(GreetingsServiceApplication.class, args);
-                }
-            }
-            @RestController
-            class GreetingsRestController {
-                @RequestMapping(method=RequestMethod.GET, value="/hi/{name}")
-                Map<String, String> hi(@PathVariable String name, @RequestHeader(value = "X-CNJ-Name", required=false) Optional<String> cn) {
-                    String resolvedName=cn.orElse(name);
-                    return Collections.singletonMap("greeting", "Hello, " + resolvedName + "!");
-                }
-            }
-            // bootstrap.properties
-            spring.application.name=greetings-service
-            server.port=${PORT:0}
-            eureka.intance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.valuie}}
-            // DiscoveryClientCLR.java
-            @Compoent
-            public class DiscoveryClientCLR implements CommandLineRunner {
-                private final DiscoveryClient discoveryClient;
-                private Log log = LogFactory.getLog(getClass());
-                @Autowired
-                public DiscoveryClientCLR(DiscoveryClient discoveryClient) {
-                    this.discoveryClient=discoveryClient;
-                }
-                @Overrid
-                public void run(String... args) throws Exception {
-                    this.log.info("localServiceInstance");
-                    this.logServiceInstance(this.discoveryClient.getLocalServiceInstanec());
-                    String.serviceId="greeting-service";
-                    this.log.info(String.format("registered instances of '%s', serviceId));
-                    this.discoveryClient.getInstances(serivceId).forEach(this::logServiceInstance);
-                }
-                private void logServiceInstance(ServiceInstance si) {
-                    String msg = String.format("host=%s, port=%s, serviceId=%s", si.getHost(), si.getPort(), si.getServiceId());
-                    log.info(msg);
-                }
-            }
-            
-            ```
-            - 인스턴스를 랜덤하게 하나 선택 가능
-            - 응답 가중치 전략 선택 가능
-            - 넷플릭스 리본 
-                - 클라이언트 로드밸런싱 라이브러리 
-                - 라운드로빈, 응답가중치, 확장성 다양한 로드밸런싱 전략을 지원함.
-            ```java
-            // RibbonCLR.java
-            @Component
-            public class RibbonCLR implements CommandLineRunner {
-                private final DiscoveryClient discoveryClient;
+```java
+// GreetingsServiceApplication.java
+@EnableDiscoveryClient
+@SpringBootApplication
+public class GreetingsServiceApplication {
+    public static void main(String args[]){
+        SpringApplication.run(GreetingsServiceApplication.class, args);
+    }
+}
+@RestController
+class GreetingsRestController {
+    @RequestMapping(method=RequestMethod.GET, value="/hi/{name}")
+    Map<String, String> hi(@PathVariable String name, @RequestHeader(value = "X-CNJ-Name", required=false) Optional<String> cn) {
+        String resolvedName=cn.orElse(name);
+        return Collections.singletonMap("greeting", "Hello, " + resolvedName + "!");
+    }
+}
+// bootstrap.properties
+spring.application.name=greetings-service
+server.port=${PORT:0}
+eureka.intance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.valuie}}
+// DiscoveryClientCLR.java
+@Compoent
+public class DiscoveryClientCLR implements CommandLineRunner {
+    private final DiscoveryClient discoveryClient;
+    private Log log = LogFactory.getLog(getClass());
+    @Autowired
+    public DiscoveryClientCLR(DiscoveryClient discoveryClient) {
+        this.discoveryClient=discoveryClient;
+    }
+    @Overrid
+    public void run(String... args) throws Exception {
+        this.log.info("localServiceInstance");
+        this.logServiceInstance(this.discoveryClient.getLocalServiceInstanec());
+        String.serviceId="greeting-service";
+        this.log.info(String.format("registered instances of '%s', serviceId));
+        this.discoveryClient.getInstances(serivceId).forEach(this::logServiceInstance);
+    }
+    private void logServiceInstance(ServiceInstance si) {
+        String msg = String.format("host=%s, port=%s, serviceId=%s", si.getHost(), si.getPort(), si.getServiceId());
+        log.info(msg);
+    }
+}
 
-                private final Log log = LogFactory.getLog(getClass());
+```
+- 인스턴스를 랜덤하게 하나 선택 가능
+- 응답 가중치 전략 선택 가능
+- 넷플릭스 리본 
+    - 클라이언트 로드밸런싱 라이브러리 
+    - 라운드로빈, 응답가중치, 확장성 다양한 로드밸런싱 전략을 지원함.
+```java
+// RibbonCLR.java
+@Component
+public class RibbonCLR implements CommandLineRunner {
+    private final DiscoveryClient discoveryClient;
 
-                public RibbonCLR(DiscoveryClient discoveryClient) {
-                this.discoveryClient = discoveryClient;
-                }
+    private final Log log = LogFactory.getLog(getClass());
 
-                @Override
-                public void run(ApplicationArguments args) throws Exception {
+    public RibbonCLR(DiscoveryClient discoveryClient) {
+    this.discoveryClient = discoveryClient;
+    }
 
-                String serviceId = "greetings-service";
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
 
-                // <1>
-                List<Server> servers = this.discoveryClient.getInstances(serviceId).stream()
-                .map(si -> new Server(si.getHost(), si.getPort()))
-                .collect(Collectors.toList());
+    String serviceId = "greetings-service";
 
-                // <2>
-                IRule roundRobinRule = new RoundRobinRule();
+    // <1>
+    List<Server> servers = this.discoveryClient.getInstances(serviceId).stream()
+    .map(si -> new Server(si.getHost(), si.getPort()))
+    .collect(Collectors.toList());
 
-                BaseLoadBalancer loadBalancer = LoadBalancerBuilder.newBuilder()
-                .withRule(roundRobinRule).buildFixedServerListLoadBalancer(servers);
+    // <2>
+    IRule roundRobinRule = new RoundRobinRule();
 
-                IntStream.range(0, 10).forEach(i -> {
-                // <3>
-                Server server = loadBalancer.chooseServer();
-                URI uri = URI.create("http://" + server.getHost() + ":" + server.getPort()
-                    + "/");
-                log.info("resolved service " + uri.toString());
-                });
-            }
+    BaseLoadBalancer loadBalancer = LoadBalancerBuilder.newBuilder()
+    .withRule(roundRobinRule).buildFixedServerListLoadBalancer(servers);
 
-            // LoadBalancedWebClientConfiguration .java
-            @Configuration
-            class LoadBalancedWebClientConfiguration {
-                @Bean
-                @LoadBalanced
-                WebClient webClient() {
-                return WebClient.builder().build();
-                }
-            }
+    IntStream.range(0, 10).forEach(i -> {
+    // <3>
+    Server server = loadBalancer.chooseServer();
+    URI uri = URI.create("http://" + server.getHost() + ":" + server.getPort()
+        + "/");
+    log.info("resolved service " + uri.toString());
+    });
+}
 
-            // LoadBalancedWebClientRunner.java
-            @Component
-            class LoadBalancedWebClientRunner implements ApplicationRunner {
+// LoadBalancedWebClientConfiguration .java
+@Configuration
+class LoadBalancedWebClientConfiguration {
+    @Bean
+    @LoadBalanced
+    WebClient webClient() {
+    return WebClient.builder().build();
+    }
+}
 
-                private final Log log = LogFactory.getLog(getClass());
+// LoadBalancedWebClientRunner.java
+@Component
+class LoadBalancedWebClientRunner implements ApplicationRunner {
 
-                private final WebClient client;
+    private final Log log = LogFactory.getLog(getClass());
 
-                LoadBalancedWebClientRunner(@LoadBalanced WebClient client) {
-                    this.client = client;
-                }
+    private final WebClient client;
 
-                // <1>
-                @Override
-                public void run(ApplicationArguments args) throws Exception {
+    LoadBalancedWebClientRunner(@LoadBalanced WebClient client) {
+        this.client = client;
+    }
 
-                    Map<String, String> variables = Collections.singletonMap("name",
-                    "Cloud Natives!");
+    // <1>
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
 
-                    // <2>
-                    this.client.get().uri("http://greetings-service/hi/{name}", variables)
-                        .retrieve().bodyToMono(JsonNode.class).map(x -> x.get("greeting").asText()).subscribe(greeting -> log.info("greeting: " + greeting));
-                }
-            }
-            ```
+        Map<String, String> variables = Collections.singletonMap("name",
+        "Cloud Natives!");
+
+        // <2>
+        this.client.get().uri("http://greetings-service/hi/{name}", variables)
+            .retrieve().bodyToMono(JsonNode.class).map(x -> x.get("greeting").asText()).subscribe(greeting -> log.info("greeting: " + greeting));
+    }
+}
+```
     - 클라우드 파운드리 라우트 서비스
         - 클라이언트 로드밸런싱 
         - 라우팅 동작을 규정하는 중앙의 컴포넌트 역할
@@ -188,134 +188,134 @@
             - 궁극적으로는 주어진 호스트와 포트에서 모든 HTTP요청을 받아서 처리하고, 변환하는 포워딩을 담당하는 HTTP 서비스다.
         - 빌드팩, 애플리케이션, 서비스 브로커처럼 개발해서 플랫폼에 플러그인으로 심을 수 있는 클라우드 파운드리의 확장판
         - 클라우드 파운드리는 현재로서의 하나의 요청에서 다른 요청으로 라우트 서비스 체이닝은 지원하지 않는다. 
-        ```java
-        // RouteServiceApplication.java
-        @SpringBootApplication
-        public class RouteServiceApplication {
+```java
+// RouteServiceApplication.java
+@SpringBootApplication
+public class RouteServiceApplication {
 
-                public static void main(String[] args) {
-                        SpringApplication.run(RouteServiceApplication.class, args);
+        public static void main(String[] args) {
+                SpringApplication.run(RouteServiceApplication.class, args);
+        }
+
+        // <1>
+        @Bean
+        RestTemplate restOperations() {
+                RestTemplate restTemplate = new RestTemplate(new TrustEverythingClientHttpRequestFactory()); // <2>
+                restTemplate.setErrorHandler(new NoErrorsResponseErrorHandler()); // <3>
+                return restTemplate;
+        }
+
+        private static class NoErrorsResponseErrorHandler extends DefaultResponseErrorHandler {
+
+                @Override
+                public boolean hasError(ClientHttpResponse response) throws IOException {
+                        return false;
                 }
+        }
 
-                // <1>
-                @Bean
-                RestTemplate restOperations() {
-                        RestTemplate restTemplate = new RestTemplate(new TrustEverythingClientHttpRequestFactory()); // <2>
-                        restTemplate.setErrorHandler(new NoErrorsResponseErrorHandler()); // <3>
-                        return restTemplate;
-                }
+        private static final class TrustEverythingClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
 
-                private static class NoErrorsResponseErrorHandler extends DefaultResponseErrorHandler {
-
-                        @Override
-                        public boolean hasError(ClientHttpResponse response) throws IOException {
-                                return false;
+                private static SSLContext getSslContext(TrustManager trustManager) {
+                        try {
+                                SSLContext sslContext = SSLContext.getInstance("SSL");
+                                sslContext.init(null, new TrustManager[]{trustManager}, null);
+                                return sslContext;
+                        }
+                        catch (KeyManagementException | NoSuchAlgorithmException e) {
+                                throw new RuntimeException(e);
                         }
                 }
 
-                private static final class TrustEverythingClientHttpRequestFactory extends SimpleClientHttpRequestFactory {
+                @Override
+                protected HttpURLConnection openConnection(URL url, Proxy proxy) throws IOException {
 
-                        private static SSLContext getSslContext(TrustManager trustManager) {
-                                try {
-                                        SSLContext sslContext = SSLContext.getInstance("SSL");
-                                        sslContext.init(null, new TrustManager[]{trustManager}, null);
-                                        return sslContext;
-                                }
-                                catch (KeyManagementException | NoSuchAlgorithmException e) {
-                                        throw new RuntimeException(e);
-                                }
+                        HttpURLConnection connection = super.openConnection(url, proxy);
+
+                        if (connection instanceof HttpsURLConnection) {
+                                HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
+                                SSLContext sslContext = getSslContext(new TrustEverythingTrustManager());
+                                httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+                                httpsConnection.setHostnameVerifier((s, session) -> true);
                         }
-
-                        @Override
-                        protected HttpURLConnection openConnection(URL url, Proxy proxy) throws IOException {
-
-                                HttpURLConnection connection = super.openConnection(url, proxy);
-
-                                if (connection instanceof HttpsURLConnection) {
-                                        HttpsURLConnection httpsConnection = (HttpsURLConnection) connection;
-                                        SSLContext sslContext = getSslContext(new TrustEverythingTrustManager());
-                                        httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory());
-                                        httpsConnection.setHostnameVerifier((s, session) -> true);
-                                }
-                                return connection;
-                        }
-
+                        return connection;
                 }
 
-                private static final class TrustEverythingTrustManager implements
-                    X509TrustManager {
+        }
 
-                        @Override
-                        public void checkClientTrusted(X509Certificate[] x509Certificates, String s)
-                            throws CertificateException {
-                        }
+        private static final class TrustEverythingTrustManager implements
+            X509TrustManager {
 
-                        @Override
-                        public void checkServerTrusted(X509Certificate[] x509Certificates, String s)
-                            throws CertificateException {
-                        }
-
-                        @Override
-                        public X509Certificate[] getAcceptedIssuers() {
-                                return new X509Certificate[0];
-                        }
-                }
-        }        
-
-        // RoutingRestController.java
-        @RestController
-        class RoutingRestController {
-
-                // <1>
-                private static final String FORWARDED_URL = "X-CF-Forwarded-Url";
-
-                private static final String PROXY_METADATA = "X-CF-Proxy-Metadata";
-
-                private static final String PROXY_SIGNATURE = "X-CF-Proxy-Signature";
-
-                private final Log logger = LogFactory.getLog(this.getClass());
-
-                private final RestOperations restOperations;
-
-                RoutingRestController(RestTemplate rt) {
-                        this.restOperations = rt;
+                @Override
+                public void checkClientTrusted(X509Certificate[] x509Certificates, String s)
+                    throws CertificateException {
                 }
 
-                // <2>
-                @RequestMapping(headers = {FORWARDED_URL, PROXY_METADATA, PROXY_SIGNATURE})
-                ResponseEntity<?> service(RequestEntity<byte[]> incoming) {
-
-                        this.logger.info("incoming request: " + incoming);
-
-                        HttpHeaders headers = new HttpHeaders();
-                        headers.putAll(incoming.getHeaders());
-                        headers.put("X-CNJ-Name", Collections.singletonList("Cloud Natives"));
-
-                        // <3>
-                        URI uri = headers
-                            .remove(FORWARDED_URL)
-                            .stream()
-                            .findFirst()
-                            .map(URI::create)
-                            .orElseThrow(() -> new IllegalStateException(String.format("No %s header present", FORWARDED_URL)));
-
-                        // <4>
-                        RequestEntity<?> outgoing = new RequestEntity<>(
-                            ((RequestEntity<?>) incoming).getBody(), headers, incoming.getMethod(), uri);
-
-                        this.logger.info("outgoing request: {}" + outgoing);
-
-                        return this.restOperations.exchange(outgoing, byte[].class);
+                @Override
+                public void checkServerTrusted(X509Certificate[] x509Certificates, String s)
+                    throws CertificateException {
                 }
-        }        
-        ```
 
-        - 그외 장점들
-            - 요청에 대한 전처리
-            - 인증 처리
-            - 어댑터를 이용해서 인증 타입을 전환할 수도 있다.
-            - 일정량 이상의 요청을 제한하는 로직을 추가할 수도 있다.
-            - 상용제품: 애피지
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
+                        return new X509Certificate[0];
+                }
+        }
+}        
+
+// RoutingRestController.java
+@RestController
+class RoutingRestController {
+
+        // <1>
+        private static final String FORWARDED_URL = "X-CF-Forwarded-Url";
+
+        private static final String PROXY_METADATA = "X-CF-Proxy-Metadata";
+
+        private static final String PROXY_SIGNATURE = "X-CF-Proxy-Signature";
+
+        private final Log logger = LogFactory.getLog(this.getClass());
+
+        private final RestOperations restOperations;
+
+        RoutingRestController(RestTemplate rt) {
+                this.restOperations = rt;
+        }
+
+        // <2>
+        @RequestMapping(headers = {FORWARDED_URL, PROXY_METADATA, PROXY_SIGNATURE})
+        ResponseEntity<?> service(RequestEntity<byte[]> incoming) {
+
+                this.logger.info("incoming request: " + incoming);
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.putAll(incoming.getHeaders());
+                headers.put("X-CNJ-Name", Collections.singletonList("Cloud Natives"));
+
+                // <3>
+                URI uri = headers
+                    .remove(FORWARDED_URL)
+                    .stream()
+                    .findFirst()
+                    .map(URI::create)
+                    .orElseThrow(() -> new IllegalStateException(String.format("No %s header present", FORWARDED_URL)));
+
+                // <4>
+                RequestEntity<?> outgoing = new RequestEntity<>(
+                    ((RequestEntity<?>) incoming).getBody(), headers, incoming.getMethod(), uri);
+
+                this.logger.info("outgoing request: {}" + outgoing);
+
+                return this.restOperations.exchange(outgoing, byte[].class);
+        }
+}        
+```
+
+- 그외 장점들
+    - 요청에 대한 전처리
+    - 인증 처리
+    - 어댑터를 이용해서 인증 타입을 전환할 수도 있다.
+    - 일정량 이상의 요청을 제한하는 로직을 추가할 수도 있다.
+    - 상용제품: 애피지
 
 - 엣지 서비스
     <img src="https://ssup2.github.io/images/theory_analysis/MSA/Service_Type.PNG">
@@ -335,126 +335,126 @@
     - Greeting 서비스
         엣지 서비스가 풀어야할 문제점 제시.
         
-    ```java
-    // EurekaServiceApplication.java
-    // <1>
-    @EnableEurekaServer
-    @SpringBootApplication
-    public class EurekaServiceApplication {
-        public static void main(String args[]) {
-            SpringApplication.run(EurekaServiceApplication.class, args);
-        }
+```java
+// EurekaServiceApplication.java
+// <1>
+@EnableEurekaServer
+@SpringBootApplication
+public class EurekaServiceApplication {
+    public static void main(String args[]) {
+        SpringApplication.run(EurekaServiceApplication.class, args);
     }
-    ```
+}
+```
 
-    ```
-    # application.properties
-    server.port=${PORT:8761}
-    # bootstrap.properties
-    spring.application.name=eureka-service
-    # <1>
-    eureka.client.register-with-eureka=false
-    eureka.client.fetch-registry=false
-    # <2>
-    eureka.server.enable-self-preservation=false
-    ```
+```
+# application.properties
+server.port=${PORT:8761}
+# bootstrap.properties
+spring.application.name=eureka-service
+# <1>
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+# <2>
+eureka.server.enable-self-preservation=false
+```
 
     - 1: 자기 자신 등록 안함.
     - 2: 서비스 레지스트리에 등록된 노드 중 정해진 시간 안에 생존신호를 보내지 않는 노드의 비율이 높아지면, 유레카는 일단 이를 애플리케이션 문제가 아니라 네트워크 문제라고 가정하고 생존 신호를 보내지 않는 노드를 레지스트리에서 제거하지 않는데, 이를 자기보호 모드라고 한다. 
     
-    ```java
-    // GreetingsServiceApplication.java
-    // <1>
-    @EnableDiscoveryClient
-    @SpringBootApplication
-    public class GreetingsServiceApplication {
-        public static void main(String[] args) {
-            SpringApplication.run(GreetingsServiceApplication.class, args);
-        }
-    }      
-    // DefaultGreetingsRestController.java
-    @Profile({ "default", "insecure" })
-    @RestController
-    @RequestMapping(method = RequestMethod.GET, value = "/greet/{name}")
-    class DefaultGreetingsRestController {
-        @RequestMapping
-        Map<String, String> hi(@PathVariable String name) {
-            return Collections.singletonMap("greeting", "Hello, " + name + "!");
-        }
-    }          
-    ```
-
-    - 간단한 엣지 서비스
-    ```java
-    @Profile({ "default", "insecure" })
-    @RestController
-    @RequestMapping("/api")
-    class RestTemplateGreetingsClientApiGateway {
-
-        private final RestTemplate restTemplate;
-
-        @Autowired
-        RestTemplateGreetingsClientApiGateway(
-            @LoadBalanced RestTemplate restTemplate) { // <1>
-            this.restTemplate = restTemplate;
-        }
-
-        @GetMapping("/resttemplate/{name}")
-        Map<String, String> restTemplate(@PathVariable String name) {
-
-            //@formatter:off
-            ParameterizedTypeReference<Map<String, String>> type =
-                new ParameterizedTypeReference<Map<String, String>>() {};
-            //@formatter:on
-
-            ResponseEntity<Map<String, String>> responseEntity = this.restTemplate
-            .exchange("http://greetings-service/greet/{name}", HttpMethod.GET, null,
-                type, name);
-            return responseEntity.getBody();
-        }
+```java
+// GreetingsServiceApplication.java
+// <1>
+@EnableDiscoveryClient
+@SpringBootApplication
+public class GreetingsServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(GreetingsServiceApplication.class, args);
     }
-    ```
-    - 간단하게 받아서 외부서비스를 호출하는 gateway 구현
+}      
+// DefaultGreetingsRestController.java
+@Profile({ "default", "insecure" })
+@RestController
+@RequestMapping(method = RequestMethod.GET, value = "/greet/{name}")
+class DefaultGreetingsRestController {
+    @RequestMapping
+    Map<String, String> hi(@PathVariable String name) {
+        return Collections.singletonMap("greeting", "Hello, " + name + "!");
+    }
+}          
+```
 
-    - 넷플릭스 페인
-        - RPC 사용하지 말것
-        - REST 장점을 살려라
-        - 넷플릭스 페인을 사용하면 인터페이스와 몇 가지 규약을 정의하는 것만으로 서비스 클라이언트를 쉽게 생성할 수 있다. 
+- 간단한 엣지 서비스
+```java
+@Profile({ "default", "insecure" })
+@RestController
+@RequestMapping("/api")
+class RestTemplateGreetingsClientApiGateway {
 
-        ```java
-        // <1>
-        @FeignClient(serviceId = "greetings-service")
-        interface GreetingsClient {
-            // <2>
-            @RequestMapping(method = RequestMethod.GET, value = "/greet/{name}")
-            Map<String, String> greet(@PathVariable("name") String name); // <3>
-        }
-        - 1: DiscoveryClient 추상화와 넷플릭스 리본이 클라이언트 로드밸런싱을 수행할 수 있도록 서비스 ID를 지정한다.
-        - 2: 스프링 MVC의 @RequestMapping으로 클라이언트가 어떤 종단점을 호출하는지 지정한다. @RequestMapping은 주로 서버 쪽 구현에 사용해왔겠지만 여기에서는 분명히 클라이언트에 사용되고 있음을 눈여겨 보자.
-        - 3: 반환값을 지정한다. 어려운 슈퍼 타입 토큰을 패턴을 사용하지 않고도 결과를 Map<String, String>으로 쉽게 매핑할 수 있다.
-        // <1>
-        @Profile("feign")
-        @RestController
-        @RequestMapping("/api")
-        class FeignGreetingsClientApiGateway {
+    private final RestTemplate restTemplate;
 
-            private final GreetingsClient greetingsClient;
+    @Autowired
+    RestTemplateGreetingsClientApiGateway(
+        @LoadBalanced RestTemplate restTemplate) { // <1>
+        this.restTemplate = restTemplate;
+    }
 
-            @Autowired
-            FeignGreetingsClientApiGateway(GreetingsClient greetingsClient) {
-                this.greetingsClient = greetingsClient;
-            }
+    @GetMapping("/resttemplate/{name}")
+    Map<String, String> restTemplate(@PathVariable String name) {
 
-            // <2>
-            @GetMapping("/feign/{name}")
-            Map<String, String> feign(@PathVariable String name) {
-                return this.greetingsClient.greet(name);
-            }
-        }
-        - 1: 엣지 서비스는 feign 프로파일이 적용될 때만 실행된다.
-        - 2: 엣지 서비스에 대한 호출은 여전히 REST에 의존하는 메소드 호출이다. 클라이언트는 단순하고 쓰기 쉽다. 페인을 사용할 줄 아는 개발자라면 여기에서 무슨 일이 일어나는지 금방 알아챌 것이다. 
-        ```
-        - 정리: REST호출로 다른 서비스로부터 데이터를 가져오느느 방법을 알아봄.
+        //@formatter:off
+        ParameterizedTypeReference<Map<String, String>> type =
+            new ParameterizedTypeReference<Map<String, String>>() {};
+        //@formatter:on
+
+        ResponseEntity<Map<String, String>> responseEntity = this.restTemplate
+        .exchange("http://greetings-service/greet/{name}", HttpMethod.GET, null,
+            type, name);
+        return responseEntity.getBody();
+    }
+}
+```
+- 간단하게 받아서 외부서비스를 호출하는 gateway 구현
+
+- 넷플릭스 페인
+    - RPC 사용하지 말것
+    - REST 장점을 살려라
+    - 넷플릭스 페인을 사용하면 인터페이스와 몇 가지 규약을 정의하는 것만으로 서비스 클라이언트를 쉽게 생성할 수 있다. 
+
+```java
+// <1>
+@FeignClient(serviceId = "greetings-service")
+interface GreetingsClient {
+    // <2>
+    @RequestMapping(method = RequestMethod.GET, value = "/greet/{name}")
+    Map<String, String> greet(@PathVariable("name") String name); // <3>
+}
+- 1: DiscoveryClient 추상화와 넷플릭스 리본이 클라이언트 로드밸런싱을 수행할 수 있도록 서비스 ID를 지정한다.
+- 2: 스프링 MVC의 @RequestMapping으로 클라이언트가 어떤 종단점을 호출하는지 지정한다. @RequestMapping은 주로 서버 쪽 구현에 사용해왔겠지만 여기에서는 분명히 클라이언트에 사용되고 있음을 눈여겨 보자.
+- 3: 반환값을 지정한다. 어려운 슈퍼 타입 토큰을 패턴을 사용하지 않고도 결과를 Map<String, String>으로 쉽게 매핑할 수 있다.
+// <1>
+@Profile("feign")
+@RestController
+@RequestMapping("/api")
+class FeignGreetingsClientApiGateway {
+
+    private final GreetingsClient greetingsClient;
+
+    @Autowired
+    FeignGreetingsClientApiGateway(GreetingsClient greetingsClient) {
+        this.greetingsClient = greetingsClient;
+    }
+
+    // <2>
+    @GetMapping("/feign/{name}")
+    Map<String, String> feign(@PathVariable String name) {
+        return this.greetingsClient.greet(name);
+    }
+}
+- 1: 엣지 서비스는 feign 프로파일이 적용될 때만 실행된다.
+- 2: 엣지 서비스에 대한 호출은 여전히 REST에 의존하는 메소드 호출이다. 클라이언트는 단순하고 쓰기 쉽다. 페인을 사용할 줄 아는 개발자라면 여기에서 무슨 일이 일어나는지 금방 알아챌 것이다. 
+```
+- 정리: REST호출로 다른 서비스로부터 데이터를 가져오느느 방법을 알아봄.
     
     - 넷플릭스 주울을 통한 필터링과 프록시
         
@@ -483,41 +483,41 @@
         - 주울게이트웨이
             - 시스템을 통과하는 데이터의 흐름을 한곳에서 관찰할 수 있는 장소라는 관점에서 일종의 품질 보증 도구 역할도 담당한다고 볼 수 있다.
             
-        ```java
-        @Configuration
-        @EnableZuulProxy
-        class ZuulConfiguration {
+```java
+@Configuration
+@EnableZuulProxy
+class ZuulConfiguration {
 
-            @Bean
-            CommandLineRunner commandLineRunner(RouteLocator routeLocator) { // <1>
-                Log log = LogFactory.getLog(getClass());
-                return args -> routeLocator.getRoutes().forEach(
-                r -> log.info(String.format("%s (%s) %s", r.getId(), r.getLocation(),
-                    r.getFullPath())));
-            }
+    @Bean
+    CommandLineRunner commandLineRunner(RouteLocator routeLocator) { // <1>
+        Log log = LogFactory.getLog(getClass());
+        return args -> routeLocator.getRoutes().forEach(
+        r -> log.info(String.format("%s (%s) %s", r.getId(), r.getLocation(),
+            r.getFullPath())));
+    }
 
-        }
-        - 1: RouteLocator는 인터페이스인데 구현 클래스에는 몇 가지 재미있는 내용이 담겨 있다. 스프링 클라우드는 설정에 따라 @DisvoeryClient를 알고 있는 RouteLocator 구현 클래스를 주입해준다. 
+}
+- 1: RouteLocator는 인터페이스인데 구현 클래스에는 몇 가지 재미있는 내용이 담겨 있다. 스프링 클라우드는 설정에 따라 @DisvoeryClient를 알고 있는 RouteLocator 구현 클래스를 주입해준다. 
 
-        # bootstrap.properties
-        # <1>
-        spring.application.name=greetings-client
-        # <2>
-        server.port=${PORT:8082}
-        security.oauth2.resource.userInfoUri=http://auth-service/uaa/user
-        #security.oauth2.resource.loadBalanced=false
+# bootstrap.properties
+# <1>
+spring.application.name=greetings-client
+# <2>
+server.port=${PORT:8082}
+security.oauth2.resource.userInfoUri=http://auth-service/uaa/user
+#security.oauth2.resource.loadBalanced=false
 
-        hystrix.command.default.execution.isolation.strategy=SEMAPHORE
-        spring.mvc.dispatch-options-request=true
+hystrix.command.default.execution.isolation.strategy=SEMAPHORE
+spring.mvc.dispatch-options-request=true
 
-        zuul.routes.hi.path=/lets/**
-        zuul.routes.hi.serviceId=greetings-service
-        ```
+zuul.routes.hi.path=/lets/**
+zuul.routes.hi.serviceId=greetings-service
+```
         
-    - 엣지 서비스의 보안
-    - OAuth
-    - 스프링 시큐리티
-    - 스프링 클라우드 시큐리티
+- 엣지 서비스의 보안
+- OAuth
+- 스프링 시큐리티
+- 스프링 클라우드 시큐리티
 
 ## 3. 데이터 통합
 ---

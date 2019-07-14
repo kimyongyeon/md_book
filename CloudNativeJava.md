@@ -1,5 +1,5 @@
 ## 1. 기초
----
+
 - 클라우드 네이티브 애플리케이션
 - 부트캠프
 - 12요소 애플리케이션 설정
@@ -7,7 +7,7 @@
 - 애플리케이션 마이그레이션
 
 ## 2. 웹서비스
----
+
 - REST API
 - 라우팅: 클라우드 네이티브 시스템은 동적이다. 
     - 배경: 
@@ -57,7 +57,7 @@ eureka.server.enable-self-preservation=false
 - 서비스들이 모두 유레카를 통해 서로를 발견하고 통신하므로, 유레카는 REST 서비스의 중추 신경계와도 같다.
 
     ![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFlqdcGJio_dOX8yoHA%2F-LFlqe4npvdvrtdiNTes%2Feureka-high-level-architecture.png?generation=1529844771835661&alt=media)
----
+
 - 참고: https://coe.gitbook.io/guide/service-discovery/eureka_2
 - 클라이언트 서버 의존관계 
 - org.springframework.boot:spring-boot-starter-web : 스프링 웹 어플리케이션을 만들기 위함 
@@ -313,7 +313,7 @@ class RoutingRestController {
 
 - 엣지 서비스
     ![](https://ssup2.github.io/images/theory_analysis/MSA/Service_Type.PNG)
-    ---
+    
     - Core/Atomic Service : Core Business Logic이나 Atomic한 Business Logic을 수행하는 Service이다.
     - Composite/Integration Service : Core/Atomic Service를 조합하여 구성한 Service이다.
     - API/Edge Service : Core/Atomic Service, Composite/Integration Service를 조합하여 App에게 노출되는 Service이다. API Gateway의 역활도 수행한다.
@@ -455,11 +455,11 @@ class FeignGreetingsClientApiGateway {
         
         - Zuul in Netflix's cloud Architecture
         ![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LE8aLapaOcF3H3eke0t%2F-LE8aMYFy_jwf_Vy95yR%2Fzuul-netflix-cloud-architecture.png?generation=1528095670450003&alt=media)
-        ---
+        
         
         - Zuul 2.0 Architecture
         ![](https://blobscdn.gitbook.com/v0/b/gitbook-28427.appspot.com/o/assets%2F-LE8_fwLnI2gUuguYTDU%2F-LFeAkrDtna1r8J8fu9J%2F-LE8aMYIWejnnlftUAtL%2Fzuul-how-it-works.png?generation=1529716086552876&alt=media)
-        ---
+        
        
     - 주울필터 역할
         - 동적 라우팅 로직 포함

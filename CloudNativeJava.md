@@ -325,8 +325,6 @@ class RoutingRestController {
         - 일정량 이상의 요청 제한
         - 라우팅(라우팅,필터링,API변환,클라이언트어댑터API,서비스프록시)
         - 횡단관심사
-
-    <br>
     - Greeting 서비스
         엣지 서비스가 풀어야할 문제점 제시.
         

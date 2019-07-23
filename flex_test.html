@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Flex Study</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            align-content: space-around;
+            height: 100vh;
+            background: lightgravy;
+        }
+        .item {
+            /* flex-basis: 0; 일반적으로 여백을 죽이고 하기 때문에 이건 기본속성 */
+        }
+        .item:nth-child(1) {
+            /* flex-grow: 1; 여백의 1:1:1 flex-basis가 auto로 되어 있음. */
+            flex: 1; /*flex basis 가 0으로 셋팅된다.*/
+            /* align-self: flex-end; */
+            background:rgba(255,0,0,0.5);            
+            width: 100px; 
+            height: 50px;
+            order: 2;
+        }
+        .item:nth-child(2) {
+            /* flex-grow: 5; */
+            flex: 2;
+            background:rgba(255,255,0,0.5) ;
+            width: 100px; 
+            height: 50px;
+            order: 3;
+        }
+        .item:nth-child(3) {
+            /* flex-grow: 1; */
+            flex: 1;
+            background:green; 
+            width: 100px; 
+            height: 50px;
+            order: 1;
+        }
+    
+    </style>
+</head>
+<body>
+    <h1>Flex Study</h1>
+    <div class="container">
+        <div class="item">1</div>
+        <div class="item">2</div>
+        <div class="item">3</div>
+    </div>
+</body>
+</html>

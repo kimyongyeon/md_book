@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Grid Study</title>
+    <style>
+    
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-auto-rows: minmax(10em, auto);
+            grid-gap: 1rem;
+            /* justify-items: end; */
+            align-items: end;
+            background: lightgray;
+        }
+
+        .item { 
+            background: rgba(255,0,0,0.5);
+            color: black;
+        }
+
+        .item:nth-child(1) {
+            grid-column: 1/4;
+        }
+        
+        .item:nth-child(4) {
+            grid-column: 3;
+            grid-row: 2/4;
+        }
+
+        .item:nth-child(9) {
+            grid-column: 3;
+            grid-row: 3/5;
+        }
+
+        .item:nth-child(5) {
+            /* justify-self: center; */
+            /* align-self: center; */
+        }
+
+        .item:nth-child(odd) {
+            background: rgba(255,255,0,0.5);
+            color: black;
+        }
+    
+    </style>
+</head>
+<body>
+    <h1>Grid Study</h1>
+    <div class="container">
+        <div class="item">1
+            <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum, distinctio harum ratione ut esse laudantium eligendi quae explicabo quos in aliquam, ullam officia magnam quam voluptas, ducimus a. Nam, modi?
+        </div>
+        <div class="item">2
+                <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+        </div>
+        <div class="item">3
+                <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+        </div>
+        <div class="item">4
+                <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+                Illum, distinctio harum ratione ut esse laudantium eligendi quae explicabo quos in aliquam, ullam officia magnam quam voluptas, ducimus a. Nam, modi?
+        </div>
+        <div class="item">5
+                <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+        </div>
+        <div class="item">6
+                <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+        </div>
+        <div class="item">7
+                <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+                Illum, distinctio harum ratione ut esse laudantium eligendi quae explicabo 
+        </div>
+        <div class="item">8
+                <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+        </div>
+        <div class="item">9
+                <img src="https://comps.canstockphoto.co.kr/%EC%95%84%EC%9D%B4%EC%BD%98-mafia-%EC%9D%B8%EA%B0%84-%EC%8A%A4%ED%86%A1-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8_csp10772051.jpg" alt="">
+        </div>
+    </div>
+</body>
+</html>

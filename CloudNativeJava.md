@@ -985,9 +985,38 @@ return address
 서비스 간에 메시지를 저장하고 전달하기 위한 일종의 허브로는 아파치 카프카, 래빗 엠큐, 엑티브엠큐, 엠큐시리즈 와 같은 메시지 브로커 들을 사용한다.  
 즉 메시지를 보내는 프로듀서와 메시지를 가져다가 처리하는 컨슈머는 서로 직접 연결해서 메시지를 주고받는 것이 아니라, 메시지 브로커에 접속한다. 오래된 방식의 브로커들은 일반적으로 확장이 어렵지만, 레빗엠큐나 아파치 카프카 같은 도구들은 메시지 처리 규모에 따라 확장이 가능하다.
 
+```
+$ cat input.txt | grep ERROR | wc -l > output.txt
+```
+
+
+
 #### 스프링 인티그레이션을 사용한 이벤트 주도 아키텍처
 
-여기서는 messageChannel을 이용하여 원시적으로 데이터를 이벤트에 흐름에 따라서 어떻게 구현을 할 수 있는지 원리에 대해서 설명한 내용들이다.
+<u>여기서는 messageChannel을 이용하여 원시적으로 데이터를 이벤트에 흐름에 따라서 어떻게 구현을 할 수 있는지 원리에 대해서 설명한 내용들이다.</u>
+
+MessageChannel 정의는 서로 다른 인티그레이션 플로우를 분리하기 위해 존재한다. 이를 통해 공통적인 기능을 재사용할 수 있을 뿐만 아니라 더 높은 수준의 시스템이 채널을 연결로만 사용할 수 있게 한다. MessageChannel이 바로 그 인터페이스인 것이다.  
+
+```java
+@Bean IntegrationFlow etlFlow(@Value("${input-directory:${HOME}/Desktop/in}") File dir) {
+    return IntegrationFlows.
+    // 1. 스프링 인티그레이션에 File 어뎁터를 설정한다. 어댑터가 유입되는 메시지를 처리하는 방법과 지정한 디렉토리를 몇 밀리초 간격으로 풀링할지 여부를 함께 설정한다.
+        from(Files.inboundAdapter(dir).autoCreateDirectory(true),
+        consumer -> consumer.poller(spec -> spec.fixedRate(1000)))
+    // 2. 수신된 파일을 페이로드로 포워딩하는 메소드
+        .handle(File.class, (file, headers) -> {
+            log.info("We noticed a new file, " + file);
+            return file;
+        })
+    // 3. MessageChannel 인스턴스를 사용해서, 유입된 파일의 확장자에 따라 하나 또는 2개의 인티그레이션 플로우로 라우트 한다.
+        .routeToRecipients(
+            spec -> spec.recipient(csv(), msg -> hasExt(msg.getPayload(), ".csv"))
+                .recipient(txt(), msg -> hasExt(msg.getPayload(), ".txt"))).get();
+        )
+}
+```
+
+채널은 논리적으로 분리를 제공한다. 
 
 #### 메시지 브로커, 브릿지, 경쟁적 컨슈머 패턴, 이벤트 소싱
 
